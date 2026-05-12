@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   app: {
     head: {
+      htmlAttrs: { lang: 'es' },
       title: 'Universidades México — Directorio de Universidades y Carreras',
       meta: [
         { charset: 'utf-8' },

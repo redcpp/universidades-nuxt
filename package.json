@@ -9,7 +9,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "deploy": "npm run generate && wrangler pages deploy .output/public --project-name=universidades-mexico"
   },
   "dependencies": {
     "fuse.js": "^7.0.0",

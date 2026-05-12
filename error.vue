@@ -3,7 +3,11 @@
     <AppNavbar />
     <main class="flex-1 flex items-center justify-center pt-16 px-4">
       <div class="text-center max-w-lg mx-auto animate-fade-in">
-        <div class="text-8xl mb-6 animate-float">⚠️</div>
+        <div class="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-white/5 ring-1 ring-white/10 mb-6 animate-float">
+          <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.879 16.121A3 3 0 1014.12 11.88M12 8v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
         <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
           {{ title }}
         </h1>

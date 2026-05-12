@@ -5,6 +5,7 @@ import type { Estado } from '~/types'
 const mapContainer = ref<HTMLDivElement>()
 const tooltip = ref({ show: false, x: 0, y: 0, text: '' })
 const hoveredId = ref<string | null>(null)
+let cleanup: Array<() => void> = []
 
 const { data, pending, error } = useUniversidadesData()
 
@@ -31,9 +32,12 @@ function getEstadoInfo(svgId: string) {
   return { ...estado, count }
 }
 
-onMounted(() => {
+function bindPaths() {
   if (!mapContainer.value) return
-  const paths = mapContainer.value.querySelectorAll('path')
+  cleanup.forEach(fn => fn())
+  cleanup = []
+
+  const paths = mapContainer.value.querySelectorAll<SVGPathElement>('path')
   paths.forEach(path => {
     const svgId = path.getAttribute('id')
     if (!svgId || !idMap[svgId]) {
@@ -49,7 +53,7 @@ onMounted(() => {
     path.style.strokeWidth = '1.5'
     path.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
 
-    path.addEventListener('mouseenter', () => {
+    const onEnter = () => {
       hoveredId.value = svgId
       path.style.fill = '#3b82f6'
       path.style.filter = 'drop-shadow(0 4px 12px rgba(59, 130, 246, 0.4))'
@@ -59,34 +63,56 @@ onMounted(() => {
       if (info) {
         tooltip.value = {
           show: true,
-          x: (path as any).__mouseX || 0,
-          y: (path as any).__mouseY || 0,
+          x: tooltip.value.x,
+          y: tooltip.value.y,
           text: `${info.nombre}: ${info.count} universidades`
         }
       }
-    })
-
-    path.addEventListener('mousemove', (e) => {
+    }
+    const onMove = (e: MouseEvent) => {
       const rect = mapContainer.value!.getBoundingClientRect()
       tooltip.value.x = e.clientX - rect.left + 15
       tooltip.value.y = e.clientY - rect.top - 15
-      ;(path as any).__mouseX = e.clientX - rect.left
-      ;(path as any).__mouseY = e.clientY - rect.top
-    })
-
-    path.addEventListener('mouseleave', () => {
+    }
+    const onLeave = () => {
       hoveredId.value = null
       path.style.fill = '#e2e8f0'
       path.style.filter = 'none'
       path.style.transform = 'scale(1)'
       tooltip.value.show = false
-    })
-
-    path.addEventListener('click', () => {
+    }
+    const onClick = () => {
       const dbId = idMap[svgId]
       if (dbId) navigateTo(`/estado/${dbId}`)
+    }
+
+    path.addEventListener('mouseenter', onEnter)
+    path.addEventListener('mousemove', onMove)
+    path.addEventListener('mouseleave', onLeave)
+    path.addEventListener('click', onClick)
+
+    cleanup.push(() => {
+      path.removeEventListener('mouseenter', onEnter)
+      path.removeEventListener('mousemove', onMove)
+      path.removeEventListener('mouseleave', onLeave)
+      path.removeEventListener('click', onClick)
     })
   })
+}
+
+// Re-bind whenever the SVG container appears (after data loads) or data changes.
+watch(
+  [() => mapContainer.value, data],
+  async () => {
+    await nextTick()
+    bindPaths()
+  },
+  { immediate: true, flush: 'post' }
+)
+
+onBeforeUnmount(() => {
+  cleanup.forEach(fn => fn())
+  cleanup = []
 })
 </script>
 
@@ -103,7 +129,7 @@ onMounted(() => {
     </div>
 
     <template v-else>
-      <div ref="mapContainer" class="w-full" v-html="mexicoSvg" />
+      <div ref="mapContainer" class="w-full map-host" v-html="mexicoSvg" />
       <Transition
         enter-active-class="transition duration-200 ease-out"
         enter-from-class="opacity-0 scale-95"
@@ -130,7 +156,12 @@ onMounted(() => {
   height: auto;
   max-height: 550px;
 }
-:deep(path) {
+/* Fallback fill: paths in the source SVG have no `fill` attribute, so without
+   this they would render black before the script binds inline styles. */
+.map-host :deep(svg path) {
+  fill: #e2e8f0;
+  stroke: #ffffff;
+  stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
 </style>

@@ -1,102 +1,94 @@
 # Universidades México
 
-🔗 **[Live Demo → https://universidades-mexico.pages.dev](https://universidades-mexico.pages.dev)**
+[![Deploy](https://github.com/redcpp/universidades-nuxt/actions/workflows/deploy.yml/badge.svg)](https://github.com/redcpp/universidades-nuxt/actions/workflows/deploy.yml)
+[![Live](https://img.shields.io/badge/live-universidades--mexico.pages.dev-3b82f6?logo=cloudflare&logoColor=white)](https://universidades-mexico.pages.dev)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Nuxt 3](https://img.shields.io/badge/Nuxt-3-00DC82?logo=nuxt.js&logoColor=white)](https://nuxt.com)
 
-Search across 3,467 universities and 27,798 degree programs in Mexico — blazing fast, serverless, with instant fuzzy search.
+Searchable directory of **3,467 universities** and **27,798 degree programs** in Mexico — fully static, served from Cloudflare's edge with instant fuzzy search.
+
+🔗 **[Live demo → universidades-mexico.pages.dev](https://universidades-mexico.pages.dev)**
 
 ![OG Image](public/og-image.png)
 
-## 📸 Screenshots
+## Screenshots
 
-### Landing page
-![Landing](public/screenshots/landing.png)
+| Landing | Search |
+|---|---|
+| ![Landing](public/screenshots/landing.png) | ![Search](public/screenshots/buscador.png) |
 
-### Search with results
-![Search](public/screenshots/buscador.png)
+| University profile | Mobile |
+|---|---|
+| ![University](public/screenshots/universidad.png) | ![Mobile](public/screenshots/mobile.png) |
 
-### University profile
-![University](public/screenshots/universidad.png)
+## Highlights
 
-### Mobile view
-![Mobile](public/screenshots/mobile.png)
+- **7,000+ static pages** pre-rendered in ~6 seconds — every state and university gets its own indexable URL.
+- **Zero backend.** Search runs entirely client-side with Fuse.js (~10 KB) over a single JSON blob.
+- **Edge-hosted** on Cloudflare Pages: free, global CDN, automatic HTTPS.
+- **Interactive map** of Mexico (custom inline SVG) with hover tooltips and per-state navigation.
+- **CI/CD** via GitHub Actions — every push to `main` rebuilds and deploys.
 
-## ✨ Features
+## Tech stack
 
-- 🔍 **Instant fuzzy search** powered by Fuse.js (no server required)
-- 🗺️ **Browse by state** — 33 Mexican states
-- 🏫 **University profiles** with degrees, type, and location
-- ⚡ **7,000+ static pages** generated in ~6 seconds
-- 📱 **Fully responsive** with Tailwind CSS
-- 🌐 **Global CDN** via Cloudflare Pages
-- 🔒 **HTTPS enforced**
+| Layer | Choice | Why |
+|---|---|---|
+| Framework | [Nuxt 3](https://nuxt.com) (SSG mode) | Static generation, SEO-friendly routing, Vue 3 DX |
+| Styling | [Tailwind CSS](https://tailwindcss.com) | Utility-first, fast iteration, small bundle |
+| Search | [Fuse.js](https://fusejs.io) | Typo-tolerant fuzzy search, no server required |
+| Hosting | [Cloudflare Pages](https://pages.cloudflare.com) | Free global edge, instant cache invalidation |
+| Tests | [Vitest](https://vitest.dev) + [@nuxt/test-utils](https://nuxt.com/docs/getting-started/testing) | Component testing with happy-dom |
 
-## 🛠️ Tech Stack
+## Migration from Django
 
-| Technology | Purpose |
-|------------|---------|
-| [Nuxt 3](https://nuxt.com) | Vue 3 framework with SSG |
-| [Tailwind CSS](https://tailwindcss.com) | Utility-first CSS |
-| [Fuse.js](https://fusejs.io) | Client-side fuzzy search |
-| [Cloudflare Pages](https://pages.cloudflare.com) | Static hosting + CDN |
-
-## 📊 Data
-
-- **33** Mexican states
-- **3,467** universities
-- **27,798** degree programs
-- Source: SEP (Secretaría de Educación Pública)
-
-## ⚡ Performance
-
-- **7,000+ pages** statically generated in ~6 seconds
-- **Zero backend** — everything is static or client-side
-- **Global CDN** via Cloudflare
-- **Instant search** with Fuse.js (no server)
-
-## 🏗️ Migration from Django
+This project is a rewrite of a legacy Django 1.11 app. Notable changes:
 
 | Aspect | Before (Django) | After (Nuxt 3) |
-|--------|-----------------|----------------|
-| Backend | Django 1.11 + SQLite | None (SSG) |
+|---|---|---|
+| Backend | Django + SQLite | None — fully static |
 | Frontend | jQuery + UIkit | Vue 3 + Tailwind |
-| Map | CSSMap jQuery plugin (26MB sprites) | Responsive card grid |
-| Search | NLTK + PostgreSQL-like | Fuse.js client-side |
+| Map | CSSMap plugin (26 MB of sprites) | Inline SVG (~73 KB) |
+| Search | NLTK + DB queries | Fuse.js client-side |
 | Hosting | None | Cloudflare Pages (free) |
-| Deploy | Manual | `npm run generate` + `wrangler deploy` |
+| Deploy | Manual | `git push` → GitHub Actions |
 
-## 🤔 Why this stack?
+## Why this architecture?
 
-I chose **SSG with Nuxt 3** because this project is purely informational: 3,467 universities and 27,798 degree programs that rarely change. Generating 7,000+ static pages eliminates server costs entirely, maximizes SEO (every university gets its own indexable URL), and allows serving from a free global CDN.
+The dataset (universities and degree programs) is fundamentally **read-mostly and rarely changes**. SSG lets us:
 
-**Fuse.js** was the natural choice for search: it's lightweight (~10KB), requires no backend, and provides typo-tolerant fuzzy matching that significantly improves UX over a simple filter. Cloudflare Pages rounds out the stack with free hosting, automatic HTTPS, and global edge caching.
+1. Eliminate server costs and the operational surface area that comes with them.
+2. Maximize SEO — every university gets a pre-rendered, cacheable URL.
+3. Serve from a free global CDN with sub-100 ms TTFB anywhere.
 
-## 🗺️ Roadmap
+Fuse.js was chosen for search because the entire dataset (3.5 MB of JSON) is small enough to ship to the client, which yields zero-latency search after first load — no roundtrips, no backend to scale.
 
-- [ ] Advanced filters by field of study (medicine, engineering, law)
-- [ ] Side-by-side university comparison
-- [ ] State-level statistics with interactive charts
-
-## 🧞 Commands
+## Commands
 
 ```bash
-# Install
-npm install
-
-# Development
-npm run dev
-
-# Static generation
-npm run generate
-
-# Local preview
-npm run preview
-
-# Deploy
-npm run deploy
+npm install         # Install dependencies
+npm run dev         # Local dev server
+npm run generate    # Build static site to .output/public
+npm run preview     # Preview the generated build
+npm test            # Run component tests
+npm run deploy      # Generate + deploy to Cloudflare Pages
 ```
 
-## 📝 Notes
+## Deployment
 
-- Data was exported once from `db.sqlite3` to `public/data/universidades.json`
-- The original SEP scraper is discontinued, so the data is a historical snapshot
-- All university and state routes are pre-rendered for maximum SEO
+Automatic on every push to `main` via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+
+Required GitHub Actions secrets:
+- `CLOUDFLARE_API_TOKEN` — token with *Cloudflare Pages: Edit* permission.
+- `CLOUDFLARE_ACCOUNT_ID` — your Cloudflare account ID.
+
+Manual deploys: `npm run deploy` (requires `wrangler login`).
+
+## Data
+
+- **33** Mexican states · **3,467** universities · **27,798** degree programs.
+- Source: Secretaría de Educación Pública (SEP).
+- Exported once from `db.sqlite3` to `public/data/universidades.json`. The original SEP scraper is discontinued, so the dataset is a historical snapshot.
+
+## License
+
+[MIT](LICENSE)
