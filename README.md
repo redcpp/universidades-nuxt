@@ -1,102 +1,102 @@
 # Universidades México
 
-🔗 **[Demo en vivo → https://universidades-mexico.pages.dev](https://universidades-mexico.pages.dev)**
+🔗 **[Live Demo → https://universidades-mexico.pages.dev](https://universidades-mexico.pages.dev)**
 
-Buscador de 3,467 universidades y 27,798 carreras de México — ultra rápido, sin servidor, con búsqueda difusa instantánea.
+Search across 3,467 universities and 27,798 degree programs in Mexico — blazing fast, serverless, with instant fuzzy search.
 
-![OG Image](/og-image.png)
+![OG Image](public/og-image.png)
 
 ## 📸 Screenshots
 
 ### Landing page
-![Landing](/screenshots/landing.png)
+![Landing](public/screenshots/landing.png)
 
-### Buscador con resultados
-![Buscador](/screenshots/buscador.png)
+### Search with results
+![Search](public/screenshots/buscador.png)
 
-### Perfil de universidad
-![Universidad](/screenshots/universidad.png)
+### University profile
+![University](public/screenshots/universidad.png)
 
-### Vista mobile
-![Mobile](/screenshots/mobile.png)
+### Mobile view
+![Mobile](public/screenshots/mobile.png)
 
 ## ✨ Features
 
-- 🔍 **Búsqueda difusa instantánea** con Fuse.js (sin servidor)
-- 🗺️ **Navegación por estado** — 33 estados de México
-- 🏫 **Perfiles de universidad** con carreras, tipo, y ubicación
-- ⚡ **7,000+ páginas estáticas** generadas en ~14 segundos
-- 📱 **100% responsive** con Tailwind CSS
-- 🌐 **CDN global** vía Cloudflare Pages
-- 🔒 **HTTPS forzado**
+- 🔍 **Instant fuzzy search** powered by Fuse.js (no server required)
+- 🗺️ **Browse by state** — 33 Mexican states
+- 🏫 **University profiles** with degrees, type, and location
+- ⚡ **7,000+ static pages** generated in ~6 seconds
+- 📱 **Fully responsive** with Tailwind CSS
+- 🌐 **Global CDN** via Cloudflare Pages
+- 🔒 **HTTPS enforced**
 
 ## 🛠️ Tech Stack
 
-| Tecnología | Uso |
-|------------|-----|
-| [Nuxt 3](https://nuxt.com) | Framework Vue 3 con SSG |
+| Technology | Purpose |
+|------------|---------|
+| [Nuxt 3](https://nuxt.com) | Vue 3 framework with SSG |
 | [Tailwind CSS](https://tailwindcss.com) | Utility-first CSS |
-| [Fuse.js](https://fusejs.io) | Búsqueda difusa client-side |
-| [Cloudflare Pages](https://pages.cloudflare.com) | Hosting estático + CDN |
+| [Fuse.js](https://fusejs.io) | Client-side fuzzy search |
+| [Cloudflare Pages](https://pages.cloudflare.com) | Static hosting + CDN |
 
-## 📊 Datos
+## 📊 Data
 
-- **33** estados de México
-- **3,467** universidades
-- **27,798** carreras
-- Fuente: SEP (Secretaría de Educación Pública)
+- **33** Mexican states
+- **3,467** universities
+- **27,798** degree programs
+- Source: SEP (Secretaría de Educación Pública)
 
 ## ⚡ Performance
 
-- **7,000+ páginas** generadas estáticamente en ~14 segundos
-- **Zero backend** — todo es estático o client-side
-- **CDN global** vía Cloudflare
-- **Búsqueda instantánea** con Fuse.js (sin servidor)
+- **7,000+ pages** statically generated in ~6 seconds
+- **Zero backend** — everything is static or client-side
+- **Global CDN** via Cloudflare
+- **Instant search** with Fuse.js (no server)
 
-## 🏗️ Migración desde Django
+## 🏗️ Migration from Django
 
-| Aspecto | Antes (Django) | Ahora (Nuxt 3) |
-|---------|---------------|----------------|
-| Backend | Django 1.11 + SQLite | Ninguno (SSG) |
+| Aspect | Before (Django) | After (Nuxt 3) |
+|--------|-----------------|----------------|
+| Backend | Django 1.11 + SQLite | None (SSG) |
 | Frontend | jQuery + UIkit | Vue 3 + Tailwind |
-| Mapa | CSSMap Plugin jQuery (26MB sprites) | Grilla responsive de tarjetas |
-| Búsqueda | NLTK + PostgreSQL-like | Fuse.js client-side |
-| Hosting | No tenía | Cloudflare Pages gratis |
+| Map | CSSMap jQuery plugin (26MB sprites) | Responsive card grid |
+| Search | NLTK + PostgreSQL-like | Fuse.js client-side |
+| Hosting | None | Cloudflare Pages (free) |
 | Deploy | Manual | `npm run generate` + `wrangler deploy` |
 
-## 🤔 ¿Por qué este stack?
+## 🤔 Why this stack?
 
-Elegí **SSG con Nuxt 3** porque este proyecto es puramente informativo: 3,467 universidades y 27,798 carreras que cambian muy poco. Generar 7,000+ páginas estáticas elimina por completo el costo de servidor, maximiza el SEO (cada universidad tiene su URL indexable), y permite servir desde un CDN global gratis.
+I chose **SSG with Nuxt 3** because this project is purely informational: 3,467 universities and 27,798 degree programs that rarely change. Generating 7,000+ static pages eliminates server costs entirely, maximizes SEO (every university gets its own indexable URL), and allows serving from a free global CDN.
 
-**Fuse.js** fue la elección natural para búsqueda: es liviano (~10KB), no requiere backend, y ofrece búsqueda difusa (typo-tolerant) que mejora la UX significativamente frente a un filtro simple. Cloudflare Pages completa la ecuación con hosting gratuito, HTTPS automático y edge caching global.
+**Fuse.js** was the natural choice for search: it's lightweight (~10KB), requires no backend, and provides typo-tolerant fuzzy matching that significantly improves UX over a simple filter. Cloudflare Pages rounds out the stack with free hosting, automatic HTTPS, and global edge caching.
 
 ## 🗺️ Roadmap
 
-- [ ] Filtros avanzados por área de conocimiento (medicina, ingeniería, derecho)
-- [ ] Comparador side-by-side de universidades
-- [ ] Visualización de estadísticas por estado (gráficas interactivas)
+- [ ] Advanced filters by field of study (medicine, engineering, law)
+- [ ] Side-by-side university comparison
+- [ ] State-level statistics with interactive charts
 
-## 🧞 Comandos
+## 🧞 Commands
 
 ```bash
-# Instalar
+# Install
 npm install
 
-# Desarrollo
+# Development
 npm run dev
 
-# Generar estático
+# Static generation
 npm run generate
 
-# Preview local
+# Local preview
 npm run preview
 
 # Deploy
 npm run deploy
 ```
 
-## 📝 Notas
+## 📝 Notes
 
-- Los datos se exportaron una vez desde `db.sqlite3` a `public/data/universidades.json`
-- El scraper original de SEP está descontinuado, por lo que los datos son una snapshot histórica
-- Todas las rutas de universidad y estado son pre-renderadas para SEO máximo
+- Data was exported once from `db.sqlite3` to `public/data/universidades.json`
+- The original SEP scraper is discontinued, so the data is a historical snapshot
+- All university and state routes are pre-rendered for maximum SEO
