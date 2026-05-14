@@ -1,11 +1,12 @@
 import Fuse from 'fuse.js'
+import type { FuseResult } from 'fuse.js'
 import type { Estado, Universidad, Carrera } from '~/types'
 import type { UniversidadesData } from '~/composables/useUniversidades'
 
 export interface GroupedResults {
-  universidades: { item: Universidad; refIndex: number }[]
-  carreras: { item: Carrera; refIndex: number }[]
-  estados: { item: Estado; refIndex: number }[]
+  universidades: FuseResult<Universidad>[]
+  carreras: FuseResult<Carrera>[]
+  estados: FuseResult<Estado>[]
 }
 
 export interface SearchOptions {
@@ -27,9 +28,9 @@ export function buildSearchIndex(data: UniversidadesData): SearchIndex {
       const limit = opts.limit ?? 20
       if (!q) return { universidades: [], carreras: [], estados: [] }
       return {
-        universidades: fuseUni.search(q).slice(0, limit) as any,
-        carreras: fuseCar.search(q).slice(0, limit) as any,
-        estados: fuseEst.search(q).slice(0, limit) as any
+        universidades: fuseUni.search(q).slice(0, limit),
+        carreras: fuseCar.search(q).slice(0, limit),
+        estados: fuseEst.search(q).slice(0, limit)
       }
     }
   }

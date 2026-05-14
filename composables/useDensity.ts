@@ -51,21 +51,21 @@ export function computeDensity(data: UniversidadesData, mode: DensityMode): Dens
   }
 }
 
-const _mode = ref<DensityMode>('universidades')
-
 export function useDensity() {
   const { data } = useUniversidadesData()
+  const mode = useState<DensityMode>('density-mode', () => 'universidades')
+
   const result = computed<DensityResult | null>(() => {
     if (!data.value) return null
-    return computeDensity(data.value, _mode.value)
+    return computeDensity(data.value, mode.value)
   })
 
   function setMode(m: DensityMode) {
-    _mode.value = m
+    mode.value = m
   }
 
   return {
-    mode: computed(() => _mode.value),
+    mode: computed(() => mode.value),
     setMode,
     result
   }

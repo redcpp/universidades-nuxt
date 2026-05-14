@@ -10,7 +10,7 @@ const data = JSON.parse(readFileSync(resolve(root, 'public/data/universidades.js
 function slug(nombre) {
   return nombre
     .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/\p{M}/gu, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
