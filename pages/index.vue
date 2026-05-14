@@ -48,12 +48,15 @@ useHead({
         </div>
 
         <!-- Map + floating panel -->
-        <div class="relative">
+        <div class="relative order-first lg:order-none">
           <MexicoMap @hover="hoverState = $event" />
           <div
             v-if="hoverState"
             class="absolute right-0 top-0 hidden lg:block"
           >
+            <MapStatePanel :estado-id="hoverState.id" :data="data" />
+          </div>
+          <div v-if="hoverState" class="block lg:hidden mt-4">
             <MapStatePanel :estado-id="hoverState.id" :data="data" />
           </div>
         </div>
