@@ -18,12 +18,21 @@ describe('DataRow', () => {
     expect(w.find('[data-testid="row-index"]').exists()).toBe(false)
   })
 
-  it('renders as a NuxtLink when to provided', () => {
+  it('forwards to prop when rendered as NuxtLink', () => {
     const w = mount(DataRow, {
       props: { to: '/estado/100' },
       slots: { default: 'X' },
-      global: { stubs: { NuxtLink: { template: '<a class="stub"><slot /></a>' } } }
+      global: {
+        stubs: {
+          NuxtLink: {
+            props: ['to'],
+            template: '<a class="stub" :data-to="to"><slot /></a>'
+          }
+        }
+      }
     })
-    expect(w.find('a.stub').exists()).toBe(true)
+    const a = w.find('a.stub')
+    expect(a.exists()).toBe(true)
+    expect(a.attributes('data-to')).toBe('/estado/100')
   })
 })

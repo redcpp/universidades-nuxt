@@ -11,6 +11,7 @@ const props = withDefaults(defineProps<Props>(), { active: false, as: 'span' })
   <component
     :is="props.as"
     :href="props.as === 'a' ? props.href : undefined"
+    :type="props.as === 'button' ? 'button' : undefined"
     :class="[
       'inline-flex items-center px-2.5 py-1 rounded-sm text-[12px] font-medium border transition-colors',
       'font-mono uppercase tracking-[0.08em]',
