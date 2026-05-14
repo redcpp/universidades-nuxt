@@ -45,8 +45,29 @@ describe('computeDensity', () => {
   })
 
   it('assigns a step 0-4 via .stepFor()', () => {
-    const d = computeDensity(fixture as any, 'universidades')
-    expect(d.stepFor(2)).toBe(4)
-    expect(d.stepFor(0)).toBe(0)
+    const richFixture = {
+      estados: [
+        { id: 1, nombre: 'A', slug: 'a', imagen: null, municipios: 0 },
+        { id: 2, nombre: 'B', slug: 'b', imagen: null, municipios: 0 },
+        { id: 3, nombre: 'C', slug: 'c', imagen: null, municipios: 0 },
+        { id: 4, nombre: 'D', slug: 'd', imagen: null, municipios: 0 }
+      ],
+      universidades: [
+        // estado 1: 10 unis (t=1.0 → step 4)
+        ...Array.from({ length: 10 }, (_, i) => ({ id: 100 + i, nombre: `u${i}`, tipo: 'Pública', sitio_web: null, estado_id: 1, slug: `u${i}` })),
+        // estado 2: 5 unis  (t=0.5 → step 3, since 0.5 in [0.4, 0.7))
+        ...Array.from({ length: 5 }, (_, i) => ({ id: 200 + i, nombre: `v${i}`, tipo: 'Pública', sitio_web: null, estado_id: 2, slug: `v${i}` })),
+        // estado 3: 1 uni   (t=0.1 → step 1)
+        { id: 300, nombre: 'w', tipo: 'Pública', sitio_web: null, estado_id: 3, slug: 'w' }
+        // estado 4: 0 unis  (t=0 → step 0)
+      ],
+      carreras: []
+    }
+    const d = computeDensity(richFixture as any, 'universidades')
+    expect(d.stepFor(1)).toBe(4)  // t=1.0
+    expect(d.stepFor(2)).toBe(3)  // t=0.5
+    expect(d.stepFor(3)).toBe(1)  // t=0.1
+    expect(d.stepFor(4)).toBe(0)  // no value
+    expect(d.stepFor(999)).toBe(0)  // unknown id
   })
 })

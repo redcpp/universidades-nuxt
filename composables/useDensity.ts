@@ -37,9 +37,9 @@ export function computeDensity(data: UniversidadesData, mode: DensityMode): Dens
     const v = values.get(id) ?? 0
     if (v === 0 || max === 0) return 0
     const t = v / max
-    if (t < 0.15) return 1
-    if (t < 0.3) return 2
-    if (t < 0.5) return 3
+    if (t < 0.2) return 1
+    if (t < 0.4) return 2
+    if (t < 0.7) return 3
     return 4
   }
 
