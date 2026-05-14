@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { mexicoSvg } from '~/composables/mexicoSvg'
-import type { Estado } from '~/types'
 
 const emit = defineEmits<{
   hover: [estado: { id: number; nombre: string; svgId: string } | null]
