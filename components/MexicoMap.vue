@@ -2,12 +2,13 @@
 import { mexicoSvg } from '~/composables/mexicoSvg'
 import type { Estado } from '~/types'
 
-const mapContainer = ref<HTMLDivElement>()
-const tooltip = ref({ show: false, x: 0, y: 0, text: '' })
-const hoveredId = ref<string | null>(null)
-let cleanup: Array<() => void> = []
+const emit = defineEmits<{
+  hover: [estado: { id: number; nombre: string; svgId: string } | null]
+}>()
 
+const mapContainer = ref<HTMLDivElement>()
 const { data, pending, error } = useUniversidadesData()
+const { result: density } = useDensity()
 
 const idMap: Record<string, number> = {
   agu: 81, bcn: 82, bcs: 83, cam: 84, chp: 87, chh: 88,
@@ -17,92 +18,82 @@ const idMap: Record<string, number> = {
   son: 115, tab: 116, tam: 117, tla: 118, ver: 119, yuc: 120,
   zac: 121, cmx: 124
 }
+const reverseIdMap: Record<number, string> = Object.fromEntries(
+  Object.entries(idMap).map(([k, v]) => [v, k])
+)
 
-const estadoMap = computed(() => {
-  if (!data.value) return new Map<number, Estado>()
-  return new Map(data.value.estados.map(e => [e.id, e]))
-})
+const stepColors = ['var(--data-0)', 'var(--data-1)', 'var(--data-2)', 'var(--data-3)', 'var(--data-4)'] as const
 
-function getEstadoInfo(svgId: string) {
-  const dbId = idMap[svgId]
-  if (!dbId) return null
-  const estado = estadoMap.value.get(dbId)
-  if (!estado) return null
-  const count = data.value?.universidades.filter(u => u.estado_id === dbId).length ?? 0
-  return { ...estado, count }
-}
+let cleanup: Array<() => void> = []
+
+function fillForStep(step: 0 | 1 | 2 | 3 | 4) { return stepColors[step] }
 
 function bindPaths() {
-  if (!mapContainer.value) return
+  if (!mapContainer.value || !data.value) return
   cleanup.forEach(fn => fn())
   cleanup = []
 
   const paths = mapContainer.value.querySelectorAll<SVGPathElement>('path')
-  paths.forEach(path => {
+  paths.forEach((path, idx) => {
     const svgId = path.getAttribute('id')
     if (!svgId || !idMap[svgId]) {
-      path.style.fill = '#f1f5f9'
-      path.style.stroke = '#e2e8f0'
-      path.style.strokeWidth = '1.5'
+      path.style.fill = 'var(--hairline-2)'
+      path.style.stroke = 'var(--surface)'
+      path.style.strokeWidth = '1'
       return
     }
+    const estadoId = idMap[svgId]
+    const step = density.value?.stepFor(estadoId) ?? 0
 
     path.style.cursor = 'pointer'
-    path.style.fill = '#e2e8f0'
-    path.style.stroke = '#ffffff'
-    path.style.strokeWidth = '1.5'
-    path.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+    path.style.stroke = 'var(--surface)'
+    path.style.strokeWidth = '1'
+    path.style.fill = fillForStep(step)
+    path.style.transition = `fill var(--ease-in-out) 400ms ${idx * 5}ms,
+                             stroke 200ms var(--ease-out),
+                             stroke-width 200ms var(--ease-out)`
+
+    path.setAttribute('tabindex', '0')
+    path.setAttribute('role', 'button')
+    const estado = data.value!.estados.find(e => e.id === estadoId)
+    const v = density.value?.valueFor(estadoId) ?? 0
+    path.setAttribute('aria-label', `${estado?.nombre ?? svgId} — ${v}`)
 
     const onEnter = () => {
-      hoveredId.value = svgId
-      path.style.fill = '#3b82f6'
-      path.style.filter = 'drop-shadow(0 4px 12px rgba(59, 130, 246, 0.4))'
-      path.style.transform = 'scale(1.01)'
-      path.style.transformOrigin = 'center'
-      const info = getEstadoInfo(svgId)
-      if (info) {
-        tooltip.value = {
-          show: true,
-          x: tooltip.value.x,
-          y: tooltip.value.y,
-          text: `${info.nombre}: ${info.count} universidades`
-        }
-      }
-    }
-    const onMove = (e: MouseEvent) => {
-      const rect = mapContainer.value!.getBoundingClientRect()
-      tooltip.value.x = e.clientX - rect.left + 15
-      tooltip.value.y = e.clientY - rect.top - 15
+      path.style.stroke = 'var(--accent)'
+      path.style.strokeWidth = '1.5'
+      if (estado) emit('hover', { id: estado.id, nombre: estado.nombre, svgId })
     }
     const onLeave = () => {
-      hoveredId.value = null
-      path.style.fill = '#e2e8f0'
-      path.style.filter = 'none'
-      path.style.transform = 'scale(1)'
-      tooltip.value.show = false
+      path.style.stroke = 'var(--surface)'
+      path.style.strokeWidth = '1'
+      emit('hover', null)
     }
-    const onClick = () => {
-      const dbId = idMap[svgId]
-      if (dbId) navigateTo(`/estado/${dbId}`)
+    const onClick = () => navigateTo(`/estado/${estadoId}`)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }
     }
 
     path.addEventListener('mouseenter', onEnter)
-    path.addEventListener('mousemove', onMove)
     path.addEventListener('mouseleave', onLeave)
+    path.addEventListener('focus', onEnter)
+    path.addEventListener('blur', onLeave)
     path.addEventListener('click', onClick)
+    path.addEventListener('keydown', onKey)
 
     cleanup.push(() => {
       path.removeEventListener('mouseenter', onEnter)
-      path.removeEventListener('mousemove', onMove)
       path.removeEventListener('mouseleave', onLeave)
+      path.removeEventListener('focus', onEnter)
+      path.removeEventListener('blur', onLeave)
       path.removeEventListener('click', onClick)
+      path.removeEventListener('keydown', onKey)
     })
   })
 }
 
-// Re-bind whenever the SVG container appears (after data loads) or data changes.
 watch(
-  [() => mapContainer.value, data],
+  [() => mapContainer.value, data, () => density.value],
   async () => {
     await nextTick()
     bindPaths()
@@ -114,39 +105,19 @@ onBeforeUnmount(() => {
   cleanup.forEach(fn => fn())
   cleanup = []
 })
+
+defineExpose({ reverseIdMap })
 </script>
 
 <template>
   <div class="relative w-full">
-    <!-- Loading -->
-    <div v-if="pending" class="flex items-center justify-center py-20">
-      <div class="w-12 h-12 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin" />
+    <div v-if="pending" class="aspect-[4/3] flex items-center justify-center">
+      <div class="type-mono-meta text-ink-4">Cargando mapa…</div>
     </div>
-
-    <!-- Error -->
-    <div v-else-if="error" class="text-center py-12 text-slate-500">
+    <div v-else-if="error" class="aspect-[4/3] flex items-center justify-center type-mono-meta text-ink-3">
       Error al cargar el mapa.
     </div>
-
-    <template v-else>
-      <div ref="mapContainer" class="w-full map-host" v-html="mexicoSvg" />
-      <Transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="opacity-0 scale-95"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition duration-150 ease-in"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
-      >
-        <div
-          v-if="tooltip.show"
-          class="absolute pointer-events-none bg-slate-900 text-white px-4 py-2 rounded-xl shadow-2xl z-20 whitespace-nowrap text-sm font-medium"
-          :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
-        >
-          {{ tooltip.text }}
-        </div>
-      </Transition>
-    </template>
+    <div v-else ref="mapContainer" class="w-full map-host" v-html="mexicoSvg" />
   </div>
 </template>
 
@@ -154,14 +125,15 @@ onBeforeUnmount(() => {
 :deep(svg) {
   width: 100%;
   height: auto;
-  max-height: 550px;
+  max-height: 640px;
 }
-/* Fallback fill: paths in the source SVG have no `fill` attribute, so without
-   this they would render black before the script binds inline styles. */
 .map-host :deep(svg path) {
-  fill: #e2e8f0;
-  stroke: #ffffff;
-  stroke-width: 1.5;
+  fill: var(--data-0);
+  stroke: var(--surface);
+  stroke-width: 1;
   vector-effect: non-scaling-stroke;
+}
+.map-host :deep(svg path:focus) {
+  outline: none;
 }
 </style>
