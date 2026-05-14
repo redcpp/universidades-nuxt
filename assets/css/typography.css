@@ -1,0 +1,40 @@
+/* Type scale + numeric utility classes used across pages */
+:root {
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-serif: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+}
+
+html {
+  font-family: var(--font-body);
+  font-feature-settings: 'ss01', 'cv11';
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.font-serif-italic { font-family: var(--font-serif); font-style: italic; }
+
+.type-display-1 { font-size: 4.5rem; line-height: 1.02; letter-spacing: -0.04em; font-weight: 700; }
+.type-display-2 { font-size: 3rem;   line-height: 1.05; letter-spacing: -0.035em; font-weight: 700; }
+.type-h1        { font-size: 2rem;   line-height: 1.15; letter-spacing: -0.02em; font-weight: 600; }
+.type-h2        { font-size: 1.5rem; line-height: 1.2;  letter-spacing: -0.015em; font-weight: 600; }
+.type-h3        { font-size: 1.125rem; line-height: 1.3; font-weight: 600; }
+.type-body      { font-size: 0.9375rem; line-height: 1.55; }
+.type-small     { font-size: 0.8125rem; line-height: 1.5; color: var(--ink-3); }
+
+.type-mono-data { font-family: var(--font-mono); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+.type-mono-meta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+@media (max-width: 768px) {
+  .type-display-1 { font-size: 2.75rem; }
+  .type-display-2 { font-size: 2rem; }
+}
