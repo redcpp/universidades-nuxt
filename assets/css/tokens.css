@@ -1,0 +1,30 @@
+:root {
+  /* Paper & ink */
+  --paper: #FAFAF7;
+  --surface: #FFFFFF;
+  --ink: #0A0A0A;
+  --ink-2: #2A2A2A;
+  --ink-3: #6B6B6B;
+  --ink-4: #B5B5B0;
+  --hairline: #E7E5E0;
+  --hairline-2: #F0EEE8;
+
+  /* Accent (warm earth — burnt sienna) */
+  --accent: #C2410C;
+  --accent-soft: #FDF4EE;
+
+  /* Choropleth steps (low → high) */
+  --data-0: #F0EEE8;
+  --data-1: #E5DCC8;
+  --data-2: #D2BFA0;
+  --data-3: #B89876;
+  --data-4: #8A6B43;
+
+  /* Radii */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+
+  /* Shadow (one layer only — used on modals + panels) */
+  --shadow-soft: 0 8px 32px -8px rgba(0, 0, 0, 0.08);
+}
