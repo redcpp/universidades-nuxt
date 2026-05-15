@@ -10,7 +10,7 @@ describe('MapStatePanel', () => {
     expect(w.find('[data-testid="panel"]').exists()).toBe(false)
   })
 
-  it('shows state nombre, localized stats, and alphabetically-sorted top universities', () => {
+  it('shows state nombre, localized stats, and top universities ranked by carreras', () => {
     const fixture = {
       estados: [{ id: 99, nombre: 'Jalisco', slug: 'jalisco', imagen: null, municipios: 0 }],
       universidades: [
@@ -20,7 +20,13 @@ describe('MapStatePanel', () => {
         { id: 4, nombre: 'Other', tipo: 'Pública', sitio_web: null, estado_id: 88, slug: 'other' }
       ],
       carreras: [
-        { id: 10, nombre: 'X', grado: 'Lic', universidad_id: 1 }
+        // Beta: 3 carreras, Zeta: 2, Alfa: 1
+        { id: 10, nombre: 'A', grado: 'Lic', universidad_id: 2 },
+        { id: 11, nombre: 'B', grado: 'Lic', universidad_id: 2 },
+        { id: 12, nombre: 'C', grado: 'Lic', universidad_id: 2 },
+        { id: 13, nombre: 'D', grado: 'Lic', universidad_id: 1 },
+        { id: 14, nombre: 'E', grado: 'Lic', universidad_id: 1 },
+        { id: 15, nombre: 'F', grado: 'Lic', universidad_id: 3 }
       ]
     }
     const w = mount(MapStatePanel, {
@@ -29,9 +35,9 @@ describe('MapStatePanel', () => {
     })
     const dds = w.findAll('dd')
     expect(dds[0].text()).toBe('3')   // uniCount
-    expect(dds[1].text()).toBe('1')   // carrCount
+    expect(dds[1].text()).toBe('6')   // carrCount
     expect(w.text()).toContain('Jalisco')
     const liTexts = w.findAll('li').map(li => li.text())
-    expect(liTexts).toEqual(['Alfa', 'Beta', 'Zeta'])  // alphabetical, top 3 of 3 in-state
+    expect(liTexts).toEqual(['Beta', 'Zeta', 'Alfa'])  // ranked by carreras desc
   })
 })

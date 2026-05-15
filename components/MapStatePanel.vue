@@ -16,9 +16,18 @@ const stats = computed(() => {
   if (!estado.value || !props.data) return null
   const unis = props.data.universidades.filter(u => u.estado_id === estado.value!.id)
   const uniIds = new Set(unis.map(u => u.id))
+  const carrerasByUni = new Map<number, number>()
+  for (const c of props.data.carreras) {
+    if (uniIds.has(c.universidad_id)) {
+      carrerasByUni.set(c.universidad_id, (carrerasByUni.get(c.universidad_id) ?? 0) + 1)
+    }
+  }
   const carrCount = props.data.carreras.filter(c => uniIds.has(c.universidad_id)).length
   const top = [...unis]
-    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
+    .sort((a, b) => {
+      const diff = (carrerasByUni.get(b.id) ?? 0) - (carrerasByUni.get(a.id) ?? 0)
+      return diff !== 0 ? diff : a.nombre.localeCompare(b.nombre, 'es')
+    })
     .slice(0, 3)
   return { uniCount: unis.length, carrCount, top }
 })
@@ -49,20 +58,11 @@ const stats = computed(() => {
       </dl>
 
       <div class="type-mono-meta mb-2">top universidades</div>
-      <ul class="space-y-2 mb-5">
-        <li v-for="u in stats.top" :key="u.id">
-          <NuxtLink :to="`/universidad/${u.id}`" class="type-body text-ink-2 hover:text-accent transition-colors block truncate">
-            {{ u.nombre }}
-          </NuxtLink>
+      <ul class="space-y-1.5">
+        <li v-for="u in stats.top" :key="u.id" class="text-[12px] leading-snug text-ink-2 truncate">
+          {{ u.nombre }}
         </li>
       </ul>
-
-      <NuxtLink
-        :to="`/estado/${estado.id}`"
-        class="inline-flex items-center gap-2 type-mono-data text-accent hover:underline"
-      >
-        Ver estado completo →
-      </NuxtLink>
     </aside>
   </Transition>
 </template>
