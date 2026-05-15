@@ -62,15 +62,5 @@ useHead({
         </div>
       </div>
     </section>
-
-    <!-- Quiet footer-region links -->
-    <section class="border-t border-hairline">
-      <div class="max-w-console mx-auto px-6 md:px-10 py-10 flex flex-wrap items-center justify-between gap-6">
-        <p class="type-mono-meta">Datos SEP · sitio estático · MIT</p>
-        <NuxtLink to="/buscador" class="type-mono-data text-accent hover:underline">
-          Buscador completo →
-        </NuxtLink>
-      </div>
-    </section>
   </div>
 </template>
