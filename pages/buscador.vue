@@ -61,11 +61,11 @@ useHead({ title: 'Buscador — Universidades México' })
         </div>
         <DataRow
           v-for="r in results.carreras"
-          :key="r.item.id"
-          :to="`/universidad/${r.item.universidad_id}`"
+          :key="r.item.slug"
+          :to="`/carrera/${r.item.slug}`"
         >
           {{ r.item.nombre }}
-          <template #meta>{{ r.item.grado }}</template>
+          <template #meta>{{ r.item.grado }} · {{ r.item.count }}</template>
         </DataRow>
         <p v-if="!results.carreras.length" class="type-mono-meta pt-4">Sin coincidencias.</p>
       </section>

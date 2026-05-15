@@ -12,7 +12,7 @@ const focused = ref(0)
 const results = computed(() => search(query.value, { limit: 5 }))
 const flat = computed(() => [
   ...results.value.universidades.map(r => ({ kind: 'universidad', id: r.item.id, label: r.item.nombre, sub: r.item.tipo, to: `/universidad/${r.item.id}` })),
-  ...results.value.carreras.map(r => ({ kind: 'carrera', id: r.item.id, label: r.item.nombre, sub: r.item.grado, to: `/universidad/${r.item.universidad_id}` })),
+  ...results.value.carreras.map(r => ({ kind: 'carrera', id: r.item.slug, label: r.item.nombre, sub: r.item.grado, to: `/carrera/${r.item.slug}` })),
   ...results.value.estados.map(r => ({ kind: 'estado', id: r.item.id, label: r.item.nombre, sub: 'estado', to: `/estado/${r.item.id}` }))
 ])
 
