@@ -1,49 +1,20 @@
+<script setup lang="ts">
+defineProps<{ error: { statusCode: number; statusMessage?: string } }>()
+function handleError() { clearError({ redirect: '/' }) }
+</script>
+
 <template>
-  <div class="min-h-screen flex flex-col gradient-hero">
-    <AppNavbar />
-    <main class="flex-1 flex items-center justify-center pt-16 px-4">
-      <div class="text-center max-w-lg mx-auto animate-fade-in">
-        <div class="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-white/5 ring-1 ring-white/10 mb-6 animate-float">
-          <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.879 16.121A3 3 0 1014.12 11.88M12 8v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
-          {{ title }}
-        </h1>
-        <p class="text-lg text-slate-300 mb-8">
-          {{ message }}
-        </p>
-        <NuxtLink to="/" class="btn-primary text-lg px-8 py-4">
-          Volver al inicio
-        </NuxtLink>
-      </div>
-    </main>
-    <AppFooter />
+  <div class="min-h-screen flex items-center justify-center bg-paper px-6">
+    <div class="max-w-prose w-full">
+      <div class="type-mono-meta mb-2">error {{ error.statusCode }}</div>
+      <h1 class="type-display-2 text-ink mb-3">
+        {{ error.statusCode === 404 ? 'No encontramos esto.' : 'Algo salió mal.' }}
+      </h1>
+      <p class="type-body text-ink-3 mb-8">{{ error.statusMessage || 'Intenta de nuevo desde el inicio.' }}</p>
+      <button
+        @click="handleError"
+        class="type-mono-data text-accent hover:underline"
+      >Volver al mapa →</button>
+    </div>
   </div>
 </template>
-
-<script setup lang="ts">
-interface ErrorProps {
-  error: {
-    statusCode: number
-    statusMessage?: string
-    message?: string
-  }
-}
-
-const props = defineProps<ErrorProps>()
-
-const is404 = computed(() => props.error.statusCode === 404)
-
-const title = computed(() =>
-  is404.value ? 'Página no encontrada' : 'Algo salió mal'
-)
-
-const message = computed(() => {
-  if (is404.value) {
-    return 'Lo sentimos, no pudimos encontrar la página que buscas. Puede haber sido movida o eliminada.'
-  }
-  return props.error.statusMessage || props.error.message || 'Ocurrió un error inesperado. Por favor, intenta de nuevo más tarde.'
-})
-</script>

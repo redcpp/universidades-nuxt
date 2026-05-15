@@ -43,3 +43,12 @@ export function useCarrerasByUniversidad(data: UniversidadesData | null, univId:
 export function useUniversidadesByEstado(data: UniversidadesData | null, estadoId: number) {
   return data?.universidades.filter(u => u.estado_id === estadoId) ?? []
 }
+
+export function groupByTipo(universidades: Universidad[]): Record<string, Universidad[]> {
+  return universidades.reduce((acc, u) => {
+    const key = u.tipo || 'Otro'
+    if (!acc[key]) acc[key] = []
+    acc[key].push(u)
+    return acc
+  }, {} as Record<string, Universidad[]>)
+}

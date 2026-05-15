@@ -21,9 +21,19 @@ Searchable directory of **3,467 universities** and **27,798 degree programs** in
 |---|---|
 | ![University](public/screenshots/universidad.png) | ![Mobile](public/screenshots/mobile.png) |
 
+## What's new (May 2026)
+
+The UI was rewritten from first principles into a light-only "Operator's Console" identity (Linear/Stripe-grade refinement, monospace data, restrained accent, map as protagonist). New capabilities:
+
+- **⌘K command palette** — global fuzzy search across universities, programs, and states.
+- **Density choropleth toggle** — the homepage map recolors live across four metrics (universities, programs, programs-per-university, % public).
+- **`/carrera/[slug]` route** — every unique program now has its own pre-rendered page with a mini-choropleth showing where it's offered.
+
+See `docs/superpowers/specs/2026-05-11-cinematic-ui-redesign-design.md` and `docs/superpowers/plans/2026-05-11-cinematic-ui-redesign.md` for the full design and implementation.
+
 ## Highlights
 
-- **7,000+ static pages** pre-rendered in ~6 seconds — every state and university gets its own indexable URL.
+- **22,000+ static pages** pre-rendered in ~20 seconds — every state, university, and unique degree program gets its own indexable URL.
 - **Zero backend.** Search runs entirely client-side with Fuse.js (~10 KB) over a single JSON blob.
 - **Edge-hosted** on Cloudflare Pages: free, global CDN, automatic HTTPS.
 - **Interactive map** of Mexico (custom inline SVG) with hover tooltips and per-state navigation.

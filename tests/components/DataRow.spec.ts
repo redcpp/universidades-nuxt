@@ -2,11 +2,19 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import DataRow from '~/components/DataRow.vue'
 
+const nuxtLinkStub = {
+  NuxtLink: {
+    props: ['to'],
+    template: '<a class="stub" :data-to="to" :href="to"><slot /></a>'
+  }
+}
+
 describe('DataRow', () => {
   it('renders index, primary slot, and meta', () => {
     const w = mount(DataRow, {
-      props: { index: 7 },
-      slots: { default: 'Estado de México', meta: '420' }
+      props: { index: 7, to: '/x' },
+      slots: { default: 'Estado de México', meta: '420' },
+      global: { stubs: nuxtLinkStub }
     })
     expect(w.text()).toContain('07')
     expect(w.text()).toContain('Estado de México')
@@ -14,25 +22,22 @@ describe('DataRow', () => {
   })
 
   it('hides index when prop omitted', () => {
-    const w = mount(DataRow, { slots: { default: 'X' } })
+    const w = mount(DataRow, {
+      props: { to: '/x' },
+      slots: { default: 'X' },
+      global: { stubs: nuxtLinkStub }
+    })
     expect(w.find('[data-testid="row-index"]').exists()).toBe(false)
   })
 
-  it('forwards to prop when rendered as NuxtLink', () => {
+  it('renders an anchor with the to as href', () => {
     const w = mount(DataRow, {
       props: { to: '/estado/100' },
       slots: { default: 'X' },
-      global: {
-        stubs: {
-          NuxtLink: {
-            props: ['to'],
-            template: '<a class="stub" :data-to="to"><slot /></a>'
-          }
-        }
-      }
+      global: { stubs: nuxtLinkStub }
     })
     const a = w.find('a.stub')
     expect(a.exists()).toBe(true)
-    expect(a.attributes('data-to')).toBe('/estado/100')
+    expect(a.attributes('href')).toBe('/estado/100')
   })
 })

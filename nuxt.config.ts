@@ -1,19 +1,37 @@
 import { execSync } from 'node:child_process'
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
-import data from './public/data/universidades.json'
 
 execSync('node scripts/build-carrera-index.mjs', { stdio: 'inherit' })
 
-const carreraIndexPath = resolve(process.cwd(), 'public/data/carrera-index.json')
-const carreraIndex: { slugs: string[] } = existsSync(carreraIndexPath)
-  ? JSON.parse(readFileSync(carreraIndexPath, 'utf-8'))
-  : { slugs: [] }
-
 export default defineNuxtConfig({
+  compatibilityDate: '2026-05-14',
   devtools: { enabled: false },
   modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.css'],
+  vite: {
+    server: {
+      watch: {
+        ignored: [
+          '**/node_modules/**',
+          '**/.git/**',
+          '**/.nuxt/**',
+          '**/.output/**',
+          '**/.wrangler/**',
+          '**/dist/**',
+          '**/public/data/**',
+          '**/public/screenshots/**'
+        ]
+      }
+    }
+  },
+  watchers: {
+    chokidar: {
+      ignoreInitial: true,
+      followSymlinks: false,
+      ignored: /(?:^|[\\/])(?:node_modules|\.git|\.nuxt|\.output|\.wrangler|dist)(?:[\\/]|$)|[\\/]public[\\/](?:data|screenshots)(?:[\\/]|$)/
+    }
+  },
   app: {
     head: {
       htmlAttrs: { lang: 'es' },
@@ -35,13 +53,31 @@ export default defineNuxtConfig({
   },
   nitro: {
     prerender: {
-      routes: [
-        '/',
-        '/buscador',
-        ...data.estados.map((e: any) => `/estado/${e.id}`),
-        ...data.universidades.map((u: any) => `/universidad/${u.id}`),
-        ...carreraIndex.slugs.map((s: string) => `/carrera/${s}`)
-      ]
+      routes: ['/', '/buscador']
+    }
+  },
+  hooks: {
+    'nitro:init': (nitro) => {
+      nitro.hooks.hook('prerender:routes', async (routes) => {
+        const dataPath = resolve(process.cwd(), 'public/data/universidades.json')
+        const idxPath = resolve(process.cwd(), 'public/data/carrera-index.json')
+
+        const data = JSON.parse(readFileSync(dataPath, 'utf-8'))
+
+        for (const e of data.estados) {
+          routes.add(`/estado/${e.id}`)
+        }
+        for (const u of data.universidades) {
+          routes.add(`/universidad/${u.id}`)
+        }
+
+        if (existsSync(idxPath)) {
+          const idx = JSON.parse(readFileSync(idxPath, 'utf-8'))
+          for (const s of idx.slugs) {
+            routes.add(`/carrera/${s}`)
+          }
+        }
+      })
     }
   }
 })

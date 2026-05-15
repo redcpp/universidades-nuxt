@@ -1,15 +1,14 @@
 <script setup lang="ts">
 interface Props {
   index?: number
-  to?: string
+  to: string
 }
-const props = defineProps<Props>()
+defineProps<Props>()
 const padded = (n?: number) => (n === undefined ? '' : String(n).padStart(2, '0'))
 </script>
 
 <template>
-  <component
-    :is="to ? 'NuxtLink' : 'div'"
+  <NuxtLink
     :to="to"
     class="group flex items-center gap-4 px-4 py-3 border-b border-hairline last:border-b-0
            hover:bg-accent-soft transition-colors relative"
@@ -26,9 +25,8 @@ const padded = (n?: number) => (n === undefined ? '' : String(n).padStart(2, '0'
       <slot name="meta" />
     </span>
     <span
-      v-if="to"
       class="text-ink-4 group-hover:text-accent transition-colors"
       aria-hidden="true"
     >→</span>
-  </component>
+  </NuxtLink>
 </template>
