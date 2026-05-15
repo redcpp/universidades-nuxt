@@ -38,3 +38,8 @@ html {
   .type-display-1 { font-size: 2.75rem; }
   .type-display-2 { font-size: 2rem; }
 }
+
+@media (max-width: 480px) {
+  .type-display-1 { font-size: 2.25rem; }
+  .type-display-2 { font-size: 1.75rem; }
+}
