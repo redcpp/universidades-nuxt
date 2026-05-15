@@ -24,6 +24,12 @@ const reverseIdMap: Record<number, string> = Object.fromEntries(
 const stepColors = ['var(--data-0)', 'var(--data-1)', 'var(--data-2)', 'var(--data-3)', 'var(--data-4)'] as const
 
 let cleanup: Array<() => void> = []
+let hoverOverlay: SVGPathElement | null = null
+
+function clearHoverOverlay() {
+  hoverOverlay?.remove()
+  hoverOverlay = null
+}
 
 function fillForStep(step: 0 | 1 | 2 | 3 | 4) { return stepColors[step] }
 
@@ -31,6 +37,7 @@ function bindPaths() {
   if (!mapContainer.value || !data.value) return
   cleanup.forEach(fn => fn())
   cleanup = []
+  clearHoverOverlay()
 
   const paths = mapContainer.value.querySelectorAll<SVGPathElement>('path')
   paths.forEach((path, idx) => {
@@ -59,13 +66,26 @@ function bindPaths() {
     path.setAttribute('aria-label', `${estado?.nombre ?? svgId} — ${v}`)
 
     const onEnter = () => {
-      path.style.stroke = 'var(--accent)'
-      path.style.strokeWidth = '1.5'
+      // Draw a fill+stroke overlay on top so the accent isn't covered by
+      // neighbors' strokes (e.g. Hidalgo surrounded by Edomex/Puebla).
+      clearHoverOverlay()
+      const svgRoot = path.ownerSVGElement
+      const d = path.getAttribute('d')
+      if (svgRoot && d) {
+        const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        overlay.setAttribute('d', d)
+        overlay.setAttribute('vector-effect', 'non-scaling-stroke')
+        overlay.setAttribute('pointer-events', 'none')
+        overlay.style.fill = 'var(--accent)'
+        overlay.style.stroke = 'var(--accent)'
+        overlay.style.strokeWidth = '1.5'
+        svgRoot.appendChild(overlay)
+        hoverOverlay = overlay
+      }
       if (estado) emit('hover', { id: estado.id, nombre: estado.nombre, svgId })
     }
     const onLeave = () => {
-      path.style.stroke = 'var(--surface)'
-      path.style.strokeWidth = '1'
+      clearHoverOverlay()
       emit('hover', null)
     }
     const onClick = () => navigateTo(`/estado/${estadoId}`)
@@ -103,6 +123,7 @@ watch(
 onBeforeUnmount(() => {
   cleanup.forEach(fn => fn())
   cleanup = []
+  clearHoverOverlay()
 })
 
 defineExpose({ reverseIdMap })
