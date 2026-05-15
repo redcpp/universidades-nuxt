@@ -51,6 +51,9 @@ export default defineNuxtConfig({
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
     }
   },
+  experimental: {
+    payloadExtraction: false
+  },
   nitro: {
     prerender: {
       routes: ['/', '/buscador']
