@@ -1,13 +1,13 @@
 <script setup lang="ts">
 const route = useRoute()
 const id = Number(route.params.id)
-const { data, pending } = useUniversidadesData()
+const { data } = useUniversidadesData()
 
 const estado = computed(() => data.value?.estados.find(e => e.id === id) || null)
 const universidades = computed(() => data.value?.universidades.filter(u => u.estado_id === id) ?? [])
 
-watch(pending, (p) => {
-  if (!p && !estado.value) throw createError({ statusCode: 404, statusMessage: 'Estado no encontrado' })
+watch([() => data.value, estado], ([d, e]) => {
+  if (d && !e) throw createError({ statusCode: 404, statusMessage: 'Estado no encontrado' })
 }, { immediate: true })
 
 const tipos = computed(() => ['Todos', ...new Set(universidades.value.map(u => u.tipo))])

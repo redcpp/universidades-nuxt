@@ -3,15 +3,15 @@ import { carreraSlug } from '~/composables/useCarreraSlugs'
 
 const route = useRoute()
 const id = Number(route.params.id)
-const { data, pending } = useUniversidadesData()
+const { data } = useUniversidadesData()
 
 const universidad = computed(() => data.value?.universidades.find(u => u.id === id) || null)
 const estado = computed(() => universidad.value ? data.value?.estados.find(e => e.id === universidad.value!.estado_id) ?? null : null)
 const carreras = computed(() => data.value?.carreras.filter(c => c.universidad_id === id) ?? [])
 const grados = computed(() => [...new Set(carreras.value.map(c => c.grado))])
 
-watch(pending, (p) => {
-  if (!p && !universidad.value) throw createError({ statusCode: 404, statusMessage: 'Universidad no encontrada' })
+watch([() => data.value, universidad], ([d, u]) => {
+  if (d && !u) throw createError({ statusCode: 404, statusMessage: 'Universidad no encontrada' })
 }, { immediate: true })
 
 useHead(() => ({ title: universidad.value ? `${universidad.value.nombre} — Universidades México` : 'Universidades México' }))

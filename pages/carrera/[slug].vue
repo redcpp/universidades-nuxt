@@ -7,9 +7,10 @@ const { data, pending } = useUniversidadesData()
 const { idx } = useCarreraIndex()
 
 const entry = computed(() => idx.value?.entries?.[slug] ?? null)
+const idxLoaded = computed(() => (idx.value?.slugs?.length ?? 0) > 0)
 
-watch([pending, entry], ([p, e]) => {
-  if (!p && !e) throw createError({ statusCode: 404, statusMessage: 'Carrera no encontrada' })
+watch([idxLoaded, entry], ([loaded, e]) => {
+  if (loaded && !e) throw createError({ statusCode: 404, statusMessage: 'Carrera no encontrada' })
 }, { immediate: true })
 
 const universidades = computed(() => {
